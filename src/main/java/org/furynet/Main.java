@@ -1,8 +1,15 @@
 package org.furynet;
 
+import org.furynet.server.Server;
+
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Server server = Server.builder()
+                .tcpPort(42000)
+                .register(String.class)
+                .build();
+
+        server.start();
     }
 }
