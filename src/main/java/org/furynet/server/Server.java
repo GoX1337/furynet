@@ -28,13 +28,18 @@ public class Server {
     private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses) {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
-        this.fury = Fury.builder()
+        this.fury = buildFurySerde(registeredClasses);
+    }
+
+    private ThreadSafeFury buildFurySerde(List<Class<?>> registeredClasses) {
+        ThreadSafeFury fury = Fury.builder()
                 .withLanguage(Language.JAVA)
                 .requireClassRegistration(true)
                 .buildThreadSafeFury();
         for (Class<?> clazz : registeredClasses) {
-            this.fury.register(clazz);
+            fury.register(clazz);
         }
+        return fury;
     }
 
     public void start() {
@@ -57,7 +62,7 @@ public class Server {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(
                                     new RequestDecoder(fury),
-                                    new ResponseDataEncoder(),
+                                    new ResponseDataEncoder(fury),
                                     new ProcessingHandler()
                             );
                         }

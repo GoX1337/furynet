@@ -17,6 +17,8 @@ public class RequestDecoder extends ReplayingDecoder<Object> {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) throws Exception {
-        out.add(fury.deserialize(in.array()));
+        byte[] payload = in.array();
+        Object object = fury.deserialize(payload);
+        out.add(object);
     }
 }

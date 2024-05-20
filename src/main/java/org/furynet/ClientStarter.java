@@ -1,15 +1,15 @@
 package org.furynet;
 
-import org.furynet.server.Server;
+import org.furynet.client.Client;
 
-public class Main {
+public class ClientStarter {
 
     public static void main(String[] args) {
-        Server server = Server.builder()
+        Client client = Client.builder()
+                .hostname("127.0.0.1")
                 .tcpPort(42000)
                 .register(String.class)
                 .build();
-
-        server.start();
+        client.start();
     }
 }
