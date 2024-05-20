@@ -27,7 +27,7 @@ public class Client {
     private Integer udpPort;
     private final ThreadSafeFury fury;
 
-    Client(String hostname, Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses) {
+    private Client(String hostname, Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses) {
         this.hostname = hostname;
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
