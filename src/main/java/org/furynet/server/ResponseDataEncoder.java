@@ -16,6 +16,7 @@ public class ResponseDataEncoder extends MessageToByteEncoder<Object> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object obj, ByteBuf out) throws Exception {
         byte[] payload = this.fury.serialize(obj);
+        out.writeInt(payload.length);
         out.writeBytes(payload);
     }
 }

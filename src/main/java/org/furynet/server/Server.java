@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.config.Language;
+import org.furynet.protocol.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,14 +22,22 @@ public class Server {
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private Integer tcpPort;
-    private Integer udpPort;
+    private final Integer tcpPort;
+    private final Integer udpPort;
     private final ThreadSafeFury fury;
 
     private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses) {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.fury = buildFurySerde(registeredClasses);
+    }
+
+    public static void main(String[] args) {
+        Server server = Server.builder()
+                .tcpPort(42000)
+                .register(Message.class)
+                .build();
+        server.start();
     }
 
     private ThreadSafeFury buildFurySerde(List<Class<?>> registeredClasses) {

@@ -1,4 +1,4 @@
-package org.furynet.server;
+package org.furynet.client;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,16 +7,16 @@ import org.apache.fury.ThreadSafeFury;
 
 import java.util.List;
 
-public class RequestDecoder extends ReplayingDecoder<Object> {
+public class ResponseDataDecoder extends ReplayingDecoder<Object> {
 
     private final ThreadSafeFury fury;
 
-    public RequestDecoder(ThreadSafeFury fury) {
+    public ResponseDataDecoder(ThreadSafeFury fury) {
         this.fury = fury;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf buf, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
         int bufLen = buf.readInt();
         byte[] bytes = new byte[bufLen];
         buf.readBytes(bytes);

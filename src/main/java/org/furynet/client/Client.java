@@ -11,7 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.config.Language;
-import org.furynet.server.Server;
+import org.furynet.protocol.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,9 @@ public class Client {
 
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private String hostname;
-    private Integer tcpPort;
-    private Integer udpPort;
+    private final String hostname;
+    private final Integer tcpPort;
+    private final Integer udpPort;
     private final ThreadSafeFury fury;
 
     private Client(String hostname, Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses) {
@@ -32,6 +32,15 @@ public class Client {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.fury = buildFurySerde(registeredClasses);
+    }
+
+    public static void main(String[] args) {
+        Client client = Client.builder()
+                .hostname("127.0.0.1")
+                .tcpPort(42000)
+                .register(Message.class)
+                .build();
+        client.start();
     }
 
     private ThreadSafeFury buildFurySerde(List<Class<?>> registeredClasses) {
@@ -58,9 +67,9 @@ public class Client {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast(
-                            //new RequestDataEncoder(),
-                            //new ResponseDataDecoder(),
-                            //new ClientHandler()
+                            new RequestDataEncoder(fury),
+                            new ResponseDataDecoder(fury),
+                            new ClientHandler()
                     );
                 }
             });
