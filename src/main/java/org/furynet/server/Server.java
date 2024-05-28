@@ -12,6 +12,7 @@ import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.config.Language;
 import org.furynet.protocol.Message;
+import org.furynet.protocol.Ping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ public class Server {
         Server server = Server.builder()
                 .tcpPort(42000)
                 .register(Message.class)
+                .register(Ping.class)
                 .build();
         server.start();
     }
