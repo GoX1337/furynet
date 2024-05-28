@@ -10,6 +10,7 @@ import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.config.Language;
 import org.furynet.protocol.Message;
 import org.furynet.protocol.Ping;
+import org.furynet.serde.FuryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class Client {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.consumers = listeners;
-        this.fury = buildFurySerde(registeredClasses);
+        this.fury = FuryBuilder.buildFurySerde(registeredClasses);
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -55,17 +56,6 @@ public class Client {
 
     private static int randNum() {
         return new Random().nextInt((100 - 1) + 1) + 1;
-    }
-
-    private ThreadSafeFury buildFurySerde(List<Class<?>> registeredClasses) {
-        ThreadSafeFury fury = Fury.builder()
-                .withLanguage(Language.JAVA)
-                .requireClassRegistration(true)
-                .buildThreadSafeFury();
-        for (Class<?> clazz : registeredClasses) {
-            fury.register(clazz);
-        }
-        return fury;
     }
 
     public void start() {
