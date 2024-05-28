@@ -34,12 +34,12 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = Server.builder()
+        Server.builder()
                 .tcpPort(42000)
                 .register(Message.class)
                 .register(Ping.class)
-                .build();
-        server.start();
+                .build()
+                .start();
     }
 
     private ThreadSafeFury buildFurySerde(List<Class<?>> registeredClasses) {

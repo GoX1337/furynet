@@ -39,8 +39,8 @@ public class Client {
         Client client = Client.builder()
                 .hostname("127.0.0.1")
                 .tcpPort(42000)
-                .register(Message.class, (ctx, o) -> System.out.println("Message.class consumer: " + o))
-                .register(Ping.class, (ctx, o) -> System.out.println("Ping.class consumer: " + o))
+                .register(Message.class, (ctx, o) -> System.out.println("Message consumer: " + o))
+                .register(Ping.class, (ctx, o) -> System.out.println("Ping consumer: " + o))
                 .build();
 
         client.start();
