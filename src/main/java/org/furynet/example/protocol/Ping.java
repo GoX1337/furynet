@@ -1,4 +1,4 @@
-package org.furynet.protocol;
+package org.furynet.example.protocol;
 
 import java.util.Objects;
 

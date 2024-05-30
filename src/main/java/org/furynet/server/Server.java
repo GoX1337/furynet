@@ -2,21 +2,16 @@ package org.furynet.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.fury.ThreadSafeFury;
-import org.furynet.protocol.Message;
-import org.furynet.protocol.Ping;
 import org.furynet.serde.FuryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.*;
 
 public class Server {
 
@@ -25,28 +20,13 @@ public class Server {
     private final Integer tcpPort;
     private final Integer udpPort;
     private final ThreadSafeFury fury;
-    private final Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers;
+    private final Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers;
 
-    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers) {
+    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers) {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.fury = FuryBuilder.buildFurySerde(registeredClasses);
         this.consumers = consumers;
-    }
-
-    public static void main(String[] args) {
-        Server.builder()
-                .tcpPort(42000)
-                .register(Message.class, (ctx, o) -> {
-                    System.out.println("server Message consumer: " + o);
-                    ctx.writeAndFlush(new Message(1, 1));
-                })
-                .register(Ping.class, (ctx, o) -> {
-                    System.out.println("server Ping consumer: " + o);
-                    ctx.writeAndFlush(new Message(2, 2));
-                })
-                .build()
-                .start();
     }
 
     public void start() {
@@ -94,7 +74,7 @@ public class Server {
         private Integer tcpPort;
         private Integer udpPort;
         private final List<Class<?>> registeredClasses = new ArrayList<>();
-        private final Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers = new HashMap<>();
+        private final Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers = new HashMap<>();
 
         public ServerBuilder tcpPort(int port) {
             this.tcpPort = port;
@@ -106,9 +86,13 @@ public class Server {
             return this;
         }
 
-        public ServerBuilder register(Class<?> clazz, BiConsumer<ChannelHandlerContext, Object> consumer) {
-            this.registeredClasses.add(clazz);
+        public ServerBuilder register(Class<?> clazz, TriConsumer<ChannelHandlerContext, ChannelGroup, Object> consumer) {
             this.consumers.put(clazz, consumer);
+            return this;
+        }
+
+        public ServerBuilder protocol(Class<?>... classes) {
+            this.registeredClasses.addAll(Arrays.asList(classes));
             return this;
         }
 

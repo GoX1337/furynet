@@ -5,11 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
-import org.apache.fury.config.Language;
-import org.furynet.protocol.Message;
-import org.furynet.protocol.Ping;
 import org.furynet.serde.FuryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,28 +30,6 @@ public class Client {
         this.udpPort = udpPort;
         this.consumers = listeners;
         this.fury = FuryBuilder.buildFurySerde(registeredClasses);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Client client = Client.builder()
-                .hostname("127.0.0.1")
-                .tcpPort(42000)
-                .register(Message.class, (ctx, o) -> System.out.println("Message consumer: " + o))
-                .register(Ping.class, (ctx, o) -> System.out.println("Ping consumer: " + o))
-                .build();
-
-        client.start();
-
-        while (true) {
-            client.sendTcp(new Message(randNum(), randNum()));
-            Thread.sleep(500);
-            client.sendTcp(new Ping("ping msg " + randNum()));
-            Thread.sleep(1000);
-        }
-    }
-
-    private static int randNum() {
-        return new Random().nextInt((100 - 1) + 1) + 1;
     }
 
     public void start() {
@@ -117,8 +91,12 @@ public class Client {
         }
 
         public ClientBuilder register(Class<?> clazz, BiConsumer<ChannelHandlerContext, Object> listener) {
-            this.registeredClasses.add(clazz);
             this.consumers.put(clazz, listener);
+            return this;
+        }
+
+        public ClientBuilder protocol(Class<?>... registeredClasses) {
+            this.registeredClasses.addAll(Arrays.asList(registeredClasses));
             return this;
         }
 
