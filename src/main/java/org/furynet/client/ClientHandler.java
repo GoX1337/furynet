@@ -13,9 +13,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
-    private final Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers;
+    private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
 
-    public ClientHandler(Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> listeners) {
+    public ClientHandler(Map<Class<?>, BiConsumer<Connection, Object>> listeners) {
         this.consumers = listeners;
     }
 
@@ -29,10 +29,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Optional.ofNullable(this.consumers.get(msg.getClass()))
                 .orElse(ClientHandler::unknownMessageType)
-                .accept(ctx, msg);
+                .accept(new Connection(ctx), msg);
     }
 
-    private static void unknownMessageType(ChannelHandlerContext channelHandlerContext, Object o) {
+    private static void unknownMessageType(Connection channelHandlerContext, Object o) {
         logger.warn("No consumer found for event of type : " + o.getClass().getName());
     }
 }

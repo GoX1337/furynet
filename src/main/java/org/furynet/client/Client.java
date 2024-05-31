@@ -21,10 +21,10 @@ public class Client {
     private final Integer tcpPort;
     private final Integer udpPort;
     private final ThreadSafeFury fury;
-    private final Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers;
+    private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
     private Channel channel;
 
-    private Client(String hostname, Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> listeners) {
+    private Client(String hostname, Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<Connection, Object>> listeners) {
         this.hostname = hostname;
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
@@ -73,7 +73,7 @@ public class Client {
         private Integer tcpPort;
         private Integer udpPort;
         private final List<Class<?>> registeredClasses = new ArrayList<>();
-        private final Map<Class<?>, BiConsumer<ChannelHandlerContext, Object>> consumers = new HashMap<>();
+        private final Map<Class<?>, BiConsumer<Connection, Object>> consumers = new HashMap<>();
 
         public ClientBuilder hostname(String hostname) {
             this.hostname = hostname;
@@ -90,13 +90,13 @@ public class Client {
             return this;
         }
 
-        public ClientBuilder register(Class<?> clazz, BiConsumer<ChannelHandlerContext, Object> listener) {
+        public ClientBuilder register(Class<?> clazz, BiConsumer<Connection, Object> listener) {
             this.consumers.put(clazz, listener);
             return this;
         }
 
-        public ClientBuilder protocol(Class<?>... registeredClasses) {
-            this.registeredClasses.addAll(Arrays.asList(registeredClasses));
+        public ClientBuilder protocol(List<Class<?>> registeredClasses) {
+            this.registeredClasses.addAll(registeredClasses);
             return this;
         }
 

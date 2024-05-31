@@ -10,15 +10,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessingHandler.class);
 
-    private final Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers;
+    private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
     private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    public ProcessingHandler(Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers) {
+    public ProcessingHandler(Map<Class<?>, BiConsumer<Connection, Object>> consumers) {
         this.consumers = consumers;
     }
 
@@ -30,11 +31,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Optional.ofNullable(this.consumers.get(msg.getClass()))
-                .orElse(ProcessingHandler::unknownMessageType)
-                .accept(ctx, this.channels, msg);
+                .orElse(this::unknownMessageType)
+                .accept(new Connection(ctx, channels), msg);
     }
 
-    private static void unknownMessageType(ChannelHandlerContext channelHandlerContext, ChannelGroup channelGroup, Object o) {
-        logger.warn("No consumer found for event of type : " + o.getClass().getName());
+    private void unknownMessageType(Connection connection, Object o) {
+        logger.warn("Unknown message type : " + o.getClass().getName());
     }
 }

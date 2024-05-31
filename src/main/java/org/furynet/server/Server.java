@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class Server {
 
@@ -20,9 +21,9 @@ public class Server {
     private final Integer tcpPort;
     private final Integer udpPort;
     private final ThreadSafeFury fury;
-    private final Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers;
+    private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
 
-    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers) {
+    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<Connection, Object>> consumers) {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.fury = FuryBuilder.buildFurySerde(registeredClasses);
@@ -74,7 +75,7 @@ public class Server {
         private Integer tcpPort;
         private Integer udpPort;
         private final List<Class<?>> registeredClasses = new ArrayList<>();
-        private final Map<Class<?>, TriConsumer<ChannelHandlerContext, ChannelGroup, Object>> consumers = new HashMap<>();
+        private final Map<Class<?>, BiConsumer<Connection, Object>> consumers = new HashMap<>();
 
         public ServerBuilder tcpPort(int port) {
             this.tcpPort = port;
@@ -86,13 +87,13 @@ public class Server {
             return this;
         }
 
-        public ServerBuilder register(Class<?> clazz, TriConsumer<ChannelHandlerContext, ChannelGroup, Object> consumer) {
+        public ServerBuilder register(Class<?> clazz, BiConsumer<Connection, Object> consumer) {
             this.consumers.put(clazz, consumer);
             return this;
         }
 
-        public ServerBuilder protocol(Class<?>... classes) {
-            this.registeredClasses.addAll(Arrays.asList(classes));
+        public ServerBuilder protocol(List<Class<?>> registeredClasses) {
+            this.registeredClasses.addAll(registeredClasses);
             return this;
         }
 

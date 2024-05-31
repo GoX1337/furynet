@@ -3,6 +3,7 @@ package org.furynet.example;
 import org.furynet.client.Client;
 import org.furynet.example.protocol.Message;
 import org.furynet.example.protocol.Ping;
+import org.furynet.example.protocol.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ public class ClientSender {
         Client sender = Client.builder()
                 .hostname("127.0.0.1")
                 .tcpPort(42000)
-                .protocol(Message.class, Ping.class)
+                .protocol(Protocol.PROTOCOL_EXAMPLE)
                 .build();
         sender.start();
 
