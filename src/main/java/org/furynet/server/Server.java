@@ -1,8 +1,10 @@
 package org.furynet.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
-import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -11,8 +13,12 @@ import org.furynet.serde.FuryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Server {
 
@@ -21,13 +27,15 @@ public class Server {
     private final Integer tcpPort;
     private final Integer udpPort;
     private final ThreadSafeFury fury;
+    private final Map<ServerEvent, Consumer<Connection>> serverEventConsumers;
     private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
 
-    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<Connection, Object>> consumers) {
+    private Server(Integer tcpPort, Integer udpPort, List<Class<?>> registeredClasses, Map<Class<?>, BiConsumer<Connection, Object>> consumers, Map<ServerEvent, Consumer<Connection>> serverEventConsumers) {
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
         this.fury = FuryBuilder.buildFurySerde(registeredClasses);
         this.consumers = consumers;
+        this.serverEventConsumers = serverEventConsumers;
     }
 
     public void start() {
@@ -51,7 +59,7 @@ public class Server {
                             ch.pipeline().addLast(
                                     new RequestDecoder(fury),
                                     new ResponseDataEncoder(fury),
-                                    new ProcessingHandler(consumers)
+                                    new ProcessingHandler(consumers, serverEventConsumers)
                             );
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
@@ -75,6 +83,7 @@ public class Server {
         private Integer tcpPort;
         private Integer udpPort;
         private final List<Class<?>> registeredClasses = new ArrayList<>();
+        private final Map<ServerEvent, Consumer<Connection>> serverEventConsumers = new HashMap<>();
         private final Map<Class<?>, BiConsumer<Connection, Object>> consumers = new HashMap<>();
 
         public ServerBuilder tcpPort(int port) {
@@ -92,13 +101,18 @@ public class Server {
             return this;
         }
 
+        public ServerBuilder register(ServerEvent serverEvent, Consumer<Connection> consumer) {
+            this.serverEventConsumers.put(serverEvent, consumer);
+            return this;
+        }
+
         public ServerBuilder protocol(List<Class<?>> registeredClasses) {
             this.registeredClasses.addAll(registeredClasses);
             return this;
         }
 
         public Server build() {
-            return new Server(this.tcpPort, this.udpPort, this.registeredClasses, this.consumers);
+            return new Server(this.tcpPort, this.udpPort, this.registeredClasses, this.consumers, this.serverEventConsumers);
         }
     }
 }

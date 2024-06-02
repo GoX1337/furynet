@@ -11,21 +11,26 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessingHandler.class);
 
     private final Map<Class<?>, BiConsumer<Connection, Object>> consumers;
+    private final Map<ServerEvent, Consumer<Connection>> serverEventConsumers;
     private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    public ProcessingHandler(Map<Class<?>, BiConsumer<Connection, Object>> consumers) {
+    public ProcessingHandler(Map<Class<?>, BiConsumer<Connection, Object>> consumers, Map<ServerEvent, Consumer<Connection>> serverEventConsumers) {
         this.consumers = consumers;
+        this.serverEventConsumers = serverEventConsumers;
     }
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         channels.add(ctx.channel());
+        Optional.ofNullable(serverEventConsumers.get(ServerEvent.NEW_CLIENT_CONNECTION))
+                .ifPresent(connectionConsumer -> connectionConsumer.accept(new Connection(ctx, channels)));
     }
 
     @Override

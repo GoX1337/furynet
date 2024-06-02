@@ -3,7 +3,6 @@ package org.furynet.client;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.apache.fury.ThreadSafeFury;
-import org.furynet.example.protocol.Ping;
 import org.furynet.serde.FuryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

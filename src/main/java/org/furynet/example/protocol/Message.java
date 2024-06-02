@@ -1,9 +1,9 @@
 package org.furynet.example.protocol;
 
-public class Message {
+public abstract class Message {
 
-    private int x;
-    private int y;
+    protected int x;
+    protected int y;
 
     public Message(int x, int y) {
         this.x = x;
