@@ -26,7 +26,9 @@ public static final List<Class<?>> PROTOCOL_EXAMPLE = List.of(
             .register(Response.class, (c, msg) -> logger.info("Received response msg {}", msg))
             .register(BroadcastMessage.class, (c, msg) -> logger.info("Received broadcasted msg {}", msg))
             .build();
+
 client.start();
+
 client.sendTcp(new Request("Hello there"));
 ```
 
@@ -48,5 +50,6 @@ Server server = Server.builder()
             connection.sendToAllExceptTcp(msg);
         })
         .build();
+
 server.start();
 ```
