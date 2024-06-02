@@ -30,7 +30,7 @@ client.sendTcp(new Request("Hello there"));
 
 ### Server
 ```java
-Server.builder()
+Server server = Server.builder()
         .tcpPort(42000)
         .protocol(Protocol.PROTOCOL_EXAMPLE)
         .register(ServerEvent.NEW_CLIENT_CONNECTION, (connection) -> {
@@ -45,6 +45,6 @@ Server.builder()
         .register(BroadcastMessage.class, (connection, msg) -> {
             connection.sendToAllExceptTcp(msg);
         })
-        .build()
-        .start();
+        .build();
+server.start();
 ```
