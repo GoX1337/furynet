@@ -2,6 +2,8 @@
 
 [kryonet](https://github.com/EsotericSoftware/kryonet) clone but using [Netty](https://github.com/netty/netty) and [Apache Fury](https://github.com/apache/incubator-fury) for serialization/deserialization
 
+## Example
+
 ### Protocol
 ```java
 public static final List<Class<?>> PROTOCOL_EXAMPLE = List.of(
