@@ -33,6 +33,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private static void unknownMessageType(Connection channelHandlerContext, Object o) {
-        logger.warn("No consumer found for event of type : " + o.getClass().getName());
+        logger.warn("No consumer found for event of type : {}", o.getClass().getName());
     }
 }
