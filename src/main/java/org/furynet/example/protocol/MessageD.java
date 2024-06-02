@@ -10,7 +10,7 @@ public class MessageD {
 
     @Override
     public String toString() {
-        return "MessageD{" +
+        return "MessageD {" +
                 "msg='" + msg + '\'' +
                 '}';
     }

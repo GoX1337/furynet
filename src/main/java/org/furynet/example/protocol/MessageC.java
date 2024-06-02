@@ -11,7 +11,7 @@ public class MessageC extends Message {
 
     @Override
     public String toString() {
-        return "MessageC{" +
+        return "MessageC {" +
                 "z=" + z +
                 ", x=" + x +
                 ", y=" + y +

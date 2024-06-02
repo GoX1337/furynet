@@ -11,7 +11,7 @@ public class MessageA extends Message {
 
     @Override
     public String toString() {
-        return "MessageA{" +
+        return "MessageA {" +
                 "z='" + z + '\'' +
                 ", x=" + x +
                 ", y=" + y +
