@@ -1,4 +1,4 @@
 package org.furynet.example.protocol;
 
-public class NewConnection {
+public class ClientDisconnection {
 }

@@ -4,12 +4,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Connection {
-
-    private static final Logger logger = LoggerFactory.getLogger(Connection.class);
 
     private final ChannelHandlerContext channelHandlerContext;
     private final ChannelGroup channelGroup;
@@ -25,7 +21,6 @@ public class Connection {
 
     public void sendToAllTcp(Object msg) {
         for (Channel channel : this.channelGroup) {
-            logger.info("Send event {} to channel {}", msg, channel.id());
             channel.writeAndFlush(msg);
         }
     }
@@ -33,7 +28,6 @@ public class Connection {
     public void sendToAllExceptTcp(Object msg) {
         for (Channel channel : this.channelGroup) {
             if (channel != channelHandlerContext.channel()) {
-                logger.info("Send event {} to channel {}", msg, channel.id());
                 channel.writeAndFlush(msg);
             }
         }

@@ -16,7 +16,10 @@ public class ServerStarter {
                 .tcpPort(42000)
                 .protocol(Protocol.PROTOCOL_EXAMPLE)
                 .register(ServerEvent.NEW_CLIENT_CONNECTION, (connection) -> {
-                    connection.sendToAllExceptTcp(new NewConnection());
+                    connection.sendToAllExceptTcp(new ClientConnection());
+                })
+                .register(ServerEvent.CLIENT_DISCONNECTED, (connection) -> {
+                    connection.sendToAllExceptTcp(new ClientDisconnection());
                 })
                 .register(MessageA.class, (connection, msg) -> {
                     log(connection, msg);

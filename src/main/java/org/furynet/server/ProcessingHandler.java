@@ -34,6 +34,12 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Optional.ofNullable(serverEventConsumers.get(ServerEvent.CLIENT_DISCONNECTED))
+                .ifPresent(connectionConsumer -> connectionConsumer.accept(new Connection(ctx, channels)));
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Optional.ofNullable(this.consumers.get(msg.getClass()))
                 .orElse(this::unknownMessageType)
@@ -41,6 +47,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void unknownMessageType(Connection connection, Object o) {
-        logger.warn("Unknown message type : " + o.getClass().getName());
+        logger.warn("Unknown message type : {}", o.getClass().getName());
     }
 }
