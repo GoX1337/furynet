@@ -19,7 +19,7 @@ public class ServerStarter {
                     connection.sendToAllExceptTcp(new ClientConnection());
                 })
                 .register(ServerEvent.CLIENT_DISCONNECTED, (connection) -> {
-                    connection.sendToAllExceptTcp(new ClientDisconnection());
+                    connection.sendToAllTcp(new ClientDisconnection());
                 })
                 .register(MessageA.class, (connection, msg) -> {
                     log(connection, msg);
