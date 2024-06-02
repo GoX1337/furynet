@@ -18,14 +18,14 @@ public static final List<Class<?>> PROTOCOL_EXAMPLE = List.of(
 ### Client
 ```java
  Client client = Client.builder()
-                .hostname("127.0.0.1")
-                .tcpPort(42000)
-                .protocol(Protocol.PROTOCOL_EXAMPLE)
-                .register(ClientConnection.class, (connection, msg) -> logger.info("New player connected"))
-                .register(ClientDisconnection.class, (connection, msg) -> logger.info("A player disconnected"))
-                .register(Response.class, (connection, msg) -> logger.info("Received response msg {}", msg))
-                .register(BroadcastMessage.class, (connection, msg) -> logger.info("Received broadcasted msg {}", msg))
-                .build();
+            .hostname("127.0.0.1")
+            .tcpPort(42000)
+            .protocol(Protocol.PROTOCOL_EXAMPLE)
+            .register(ClientConnection.class, (c, msg) -> logger.info("New player connected"))
+            .register(ClientDisconnection.class, (c, msg) -> logger.info("A player disconnected"))
+            .register(Response.class, (c, msg) -> logger.info("Received response msg {}", msg))
+            .register(BroadcastMessage.class, (c, msg) -> logger.info("Received broadcasted msg {}", msg))
+            .build();
 client.start();
 client.sendTcp(new Request("Hello there"));
 ```
