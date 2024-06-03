@@ -19,11 +19,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         this.consumers = listeners;
     }
 
-    @Override
+    /*@Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //Message msg = new Message(5, 8);
         //ChannelFuture future = ctx.writeAndFlush(msg);
-    }
+    }*/
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
